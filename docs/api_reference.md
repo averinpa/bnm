@@ -10,35 +10,35 @@ Compile and merge descriptive and comparative metrics into a single table.
 
 ### 🔢 Descriptive Metrics
 
-| Metric                  | Calculation Function             | Description                                                                 |
-|------------------------|----------------------------------|-----------------------------------------------------------------------------|
-| `n_edges`              | `count_edges`                    | Total number of edges                                                       |
-| `n_nodes`              | `count_nodes`                    | Total number of nodes                                                       |
-| `n_colliders`          | `count_colliders`                | Number of collider structures (X → Z ← Y)                                   |
-| `n_root_nodes`         | `count_root_nodes_strict`        | Nodes with no directed or undirected parents                                |
-| `n_leaf_nodes`         | `count_leaf_nodes_strict`        | Nodes with no directed or undirected children                               |
-| `n_isolated_nodes`     | `count_isolated_nodes_strict`    | Nodes with no incident directed or undirected edges                         |
-| `n_directed_arcs`      | `count_directed_arcs`            | Number of edges marked as directed                                          |
-| `n_undirected_arcs`    | `count_undirected_arcs`          | Number of edges marked as undirected                                        |
-| `n_reversible_arcs`    | `count_reversible_arcs`          | Directed edges not part of any collider                                     |
-| `n_in_degree`          | `count_in_degree_directed`       | Number of directed parents of a node                                        |
-| `n_out_degree`         | `count_out_degree_directed`      | Number of directed children of a node                                       |
-
+| Metric | Description
+|----------------------------------|--------------------------------------|
+| `n_edges`              | Total number of edges|
+| `n_nodes`              | Total number of nodes|
+| `n_colliders`          | Number of collider structures (X → Z ← Y)|
+| `n_root_nodes`         | Nodes with no parents or connected undirected edges|
+| `n_leaf_nodes`         | Nodes with no children or connected undirected edges|
+| `n_isolated_nodes`     | Nodes with no connected edges|
+| `n_directed_arcs`      | Number of directed edges|
+| `n_undirected_arcs`    | Number of undirected edges|
+| `n_reversible_arcs`    | Directed edges not part of any collider|
+| `n_in_degree`          | Number of incoming edges|
+| `n_out_degree`         | Number of outgoing edges|
 ### ⚖️ Comparative Metrics
 
-| Metric         | Calculation Function           | Description                                                                 |
-|----------------|--------------------------------|-----------------------------------------------------------------------------|
-| `additions`    | `count_additions`              | Edges present in G2 but not in G1 (ignoring direction)                      |
-| `deletions`    | `count_deletions`              | Edges present in G1 but not in G2                                           |
-| `reversals`    | `count_reversals`              | Directed edges that were reversed or became undirected                      |
-| `shd`          | `shd`                           | Structural Hamming Distance (additions + deletions + reversals)            |
-| `hd`           | `hd`                            | Hamming Distance (additions + deletions only)                              |
-| `tp`           | `count_true_positives`         | Edges correctly predicted in G2 with same direction/type                    |
-| `fp`           | `count_false_positives`        | Extra edges in G2 not in G1                                                 |
-| `fn`           | `count_false_negatives`        | Missing edges in G2 that were in G1                                         |
-| `precision`    | `precision`                    | TP / (TP + FP)                                                              |
-| `recall`       | `recall`                       | TP / (TP + FN)                                                              |
-| `f1_score`     | `f1_score`                     | Harmonic mean of precision and recall                                       |
+| Metric         | Description|
+|----------------|------------|
+| `additions`    | Edges present in G2 but not in G1 (ignoring direction)|
+| `deletions`    | Edges present in G1 but not in G2 (ignoring direction)|
+| `reversals`    | Directed edges that were reversed or became undirected|
+| `shd`          | Structural Hamming Distance (additions + deletions + reversals)|
+| `hd`           | Hamming Distance (additions + deletions only)|
+| `tp`           | Edges presented in two graphs|
+| `fp`           | Edges in G2 not in G1|
+| `fn`           | Missing edges in G2 that were in G1|
+| `precision`    | TP / (TP + FP)|
+| `recall`       | TP / (TP + FN)|
+| `f1_score`     | Harmonic mean of precision and recall
+|
 
 ### Parameters
 
