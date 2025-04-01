@@ -29,8 +29,7 @@ BNM relies on the following Python packages:
 ### 1. **Import the package**
 
 ```python
-from bnm import BNMetrics
-from bnm.utils import generate_random_dag
+from bnm import BNMetrics, generate_random_dag
 ```
 ### 2. **Create or load graphs**  
 #### You can generate random DAGs using the built-in utility:
@@ -45,26 +44,36 @@ bnm = BNMetrics(G1, G2)
 ```
 #### You can also use just one graph:
 ```python
-bnm = BNMetrics(G1)
+bnm_single = BNMetrics(G1)
 ```
 ### 4. **Compare graph structures**
 #### Generate metrics:
 ```python
 df = bnm.compare_df(
-    descriptive_metrics="All",
+    descriptive_metrics=["n_edges"],
     comparison_metrics=["shd", "precision", "recall"]
 )
-print(df)
+print(df.head())
 ```
+| node_name | n_edges_base | n_edges | shd | precision | recall   |
+|-----------|--------------|---------|-----|-----------|----------|
+| All       | 15.0         | 19.0    | 30  | 0.105263  | 0.133333 |
+| X_8       | 3.0          | 0.0     | 3   | 0.0       | 0.0      |
+| X_15      | 1.0          | 3.0     | 4   | 0.0       | 0.0      |
+| X_1       | 5.0          | 6.0     | 11  | 0.0       | 0.0      |
+| X_6       | 2.0          | 2.0     | 4   | 0.0       | 0.0      |
+
 ### 5. **Visualize the DAGs**
 #### Compare two graphs side by side:
 ```python
-bnm.compare_two_bn(nodes=["X_3", "X_7"], option=1)
+bnm.compare_two_bn(nodes=["X_5", "X_18"], option=1)
 ```
+![BNM Graph Comparison](images/two_dags.png)
 #### Plot a single DAG:
 ```python
-bnm.plot_bn(nodes=["X_1", "X_5"], layer="d1")
+bnm.plot_bn(nodes=["X_1", "X_5"], layer="d2")
 ```
+![BNM Graph Single](images/one_dag.png)
 ## 📚 More
 
 - [API Reference](https://github.com/averinpa/bnm/blob/main/docs/api_reference.md)
