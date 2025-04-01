@@ -10,7 +10,7 @@ Originally developed as [DAGMetrics](https://github.com/averinpa/DAGMetrics) in 
 ## 📦 Installation
 
 ```bash
-pip install -e .  # from the root directory (with setup.py)
+!pip install git+https://github.com/averinpa/bnm.git
 ```
 
 ---

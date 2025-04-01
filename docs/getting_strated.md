@@ -67,6 +67,6 @@ bnm.plot_bn(nodes=["X_1", "X_5"], layer="d1")
 ```
 ## 📚 More
 
-- [API Reference](#) *(coming soon or link to actual API documentation)*
+- [API Reference](https://github.com/averinpa/bnm/blob/main/docs/api_reference.md)
 - [Paper (Averin et al., 2025)](https://doi.org/10.20944/preprints202503.0943.v1)
 - [R Version of DAGMetrics](https://github.com/averinpa/DAGMetrics)

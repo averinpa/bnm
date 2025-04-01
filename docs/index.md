@@ -6,8 +6,8 @@ BNM is a Python package for evaluating, comparing, and visualizing Bayesian Netw
 
 ## 📖 Sections
 
-- [Getting Started](getting_started.md)
-- [API Reference](getting_started.md)
+- [Getting Started](https://github.com/averinpa/bnm/blob/main/docs/getting_strated.md)
+- [API Reference](https://github.com/averinpa/bnm/blob/main/docs/api_reference.md)
 - [Example: Microbiome Case Study](examples/microbiome_analysis.ipynb) ##TODO
 
 ---
