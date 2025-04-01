@@ -70,7 +70,7 @@ class BNMetrics:
 
         # Convert and validate G2
         if G2 is not None:
-            if set(self.G1.nodes()) != set(self.G2.nodes()):
+            if set(G1.nodes()) != set(G2.nodes()):
                 raise ValueError("G1 and G2 must have the same node names and number of nodes.")
             self.G2 = self._convert_to_digraph(G2, node_names, name="G2")
             self.graph_dict = self._build_graph_dict_two_graphs(self.G1, self.G2)
