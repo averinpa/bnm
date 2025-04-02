@@ -14,20 +14,24 @@ from bnm import metrics as m
 class BNMetrics:
     def __init__(self, G1, G2=None, node_names=None):
         """
-        Initialize a BNMetrics object with one or two Bayesian networks (DAGs).
+        The `BNMetrics` class computes and compares descriptive and comparative 
+        metrics between one or two Bayesian networks (DAGs), with support for 
+        visualization.
 
-        This class supports flexible input formats for causal structure comparison.
-        The graphs can be provided either as `networkx.DiGraph` objects or as adjacency 
-        matrices (NumPy arrays or list-of-lists). If matrices are passed, `node_names` must 
-        also be provided to assign names to the nodes.
+        Initialize a BNMetrics object with one or two DAGs. 
+        This class supports flexible input formats for causal structure comparison. 
+        The graphs can be provided either as `networkx.DiGraph` objects or as 
+        adjacency matrices (NumPy arrays or list-of-lists). If matrices are 
+        passed, `node_names` must also be provided to assign names to the nodes.
 
-        All edges are processed to detect and mark bidirected edges as "undirected" using 
-        `mark_and_collapse_bidirected_edges`. Subgraphs for each node’s Markov blanket 
-        are computed and stored for downstream metric calculations and visualizations.
+        All edges are processed to detect and mark bidirected edges as "undirected". 
+        Bidirected edges are collapsed into one edge. Directed edges are marked 
+        with "directed". Subgraphs for each node’s Markov blanket are computed and 
+        stored for downstream metric calculations and visualizations.
 
         Parameters
         ----------
-        G1 : nx.DiGraph or np.ndarray or list of list
+        G1 : nx.DiGraph or np.ndarray or list of lists
             The first graph (base DAG). If not a DiGraph, it must be a square adjacency matrix.
 
         G2 : nx.DiGraph or np.ndarray or list of list, optional
@@ -48,7 +52,7 @@ class BNMetrics:
         Examples
         --------
         >>> import networkx as nx
-        >>> from bnmetrics import BNMetrics
+        >>> from bnm import BNMetrics
         >>> G1 = nx.DiGraph()
         >>> G1.add_edges_from([("A", "B"), ("C", "B")])
         >>> G2 = nx.DiGraph()
