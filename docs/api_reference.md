@@ -1,4 +1,4 @@
-# API Reference: BNM (Bayesian Network Metrics)<a href="https://github.com/averinpa/bnm/blob/cd7e82a77dfd69c1890687318ae32e37e2188192/bnm/core.py#L14" style="float: right; font-weight: normal;">[source]</a>
+# API Reference: BNM (Bayesian Network Metrics)<a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L14" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 class BNMetrics(G1, G2=None, node_names=None)
