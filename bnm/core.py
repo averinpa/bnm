@@ -39,7 +39,7 @@ class BNMetrics:
             as G1. If not provided, BNMetrics operates in single-graph mode.
 
         node_names : list of str, optional
-            Required only when G1 or G2 is given as a NumPy array or list of lists.
+            Required only when G1 and G2 is given as a NumPy array or list of lists.
             Length must match number of nodes.
 
         Raises
@@ -69,17 +69,43 @@ class BNMetrics:
         self.G1_raw = G1
         self.G2_raw = G2
 
-        # Convert and validate G1
-        self.G1 = self._convert_to_digraph(G1, node_names, name="G1")
+        # Case: G1 is DiGraph and G2 is matrix → extract node names from G1
+        if isinstance(G1, nx.DiGraph) and isinstance(G2, (np.ndarray, list)):
+            inferred_node_names = list(G1.nodes)
+            self.G1 = mark_and_collapse_bidirected_edges(G1)
+            self.G2 = self._convert_to_digraph(G2, inferred_node_names, name="G2")
 
-        # Convert and validate G2
-        if G2 is not None:
-            if set(G1.nodes()) != set(G2.nodes()):
-                raise ValueError("G1 and G2 must have the same node names and number of nodes.")
+        # Case: G1 is matrix and G2 is DiGraph → extract node names from G2
+        elif isinstance(G1, (np.ndarray, list)) and isinstance(G2, nx.DiGraph):
+            inferred_node_names = list(G2.nodes)
+            self.G1 = self._convert_to_digraph(G1, inferred_node_names, name="G1")
+            self.G2 = mark_and_collapse_bidirected_edges(G2)
+
+        # Case: both are matrices → need node_names
+        elif isinstance(G1, (np.ndarray, list)) and isinstance(G2, (np.ndarray, list)):
+            if node_names is None:
+                raise ValueError("node_names must be provided when both G1 and G2 are matrices.")
+            self.G1 = self._convert_to_digraph(G1, node_names, name="G1")
             self.G2 = self._convert_to_digraph(G2, node_names, name="G2")
+
+        # Case: both are DiGraphs → just validate and process
+        elif isinstance(G1, nx.DiGraph) and (G2 is None or isinstance(G2, nx.DiGraph)):
+            self.G1 = mark_and_collapse_bidirected_edges(G1)
+            if G2 is not None:
+                if set(G1.nodes()) != set(G2.nodes()):
+                    raise ValueError("G1 and G2 must have the same node names.")
+                self.G2 = mark_and_collapse_bidirected_edges(G2)
+            else:
+                self.G2 = None
+
+        # Unsupported input types
+        else:
+            raise TypeError("G1 and G2 must each be a networkx.DiGraph, numpy.ndarray, or list of lists.")
+
+        # Build internal graph dictionary
+        if self.G2 is not None:
             self.graph_dict = self._build_graph_dict_two_graphs(self.G1, self.G2)
         else:
-            self.G2 = None
             self.graph_dict = self._build_graph_dict_one_graph(self.G1)
 
     def _convert_to_digraph(self, G, node_names, name="G"):
