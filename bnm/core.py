@@ -438,7 +438,7 @@ class BNMetrics:
     def _mark_true_positives_color_both(self, nodes, option=1):
         """
         Return copies of merged G1 and G2 subgraphs (from the specified layer)
-        where matching edges (true positives) are marked with color='green'.
+        where matching edges (true positives) are marked with color='crimson'.
 
         Matching rules:
         - Directed: must match direction and type
@@ -469,16 +469,16 @@ class BNMetrics:
 
             if type1 == "directed":
                 if G2.has_edge(u, v) and G2[u][v].get("type") == "directed":
-                    G1_marked[u][v]["color"] = "green"
-                    G2_marked[u][v]["color"] = "green"
+                    G1_marked[u][v]["color"] = "crimson"
+                    G2_marked[u][v]["color"] = "crimson"
 
             elif type1 == "undirected":
                 if (G2.has_edge(u, v) and G2[u][v].get("type") == "undirected"):
-                    G1_marked[u][v]["color"] = "green"
-                    G2_marked[u][v]["color"] = "green"
+                    G1_marked[u][v]["color"] = "crimson"
+                    G2_marked[u][v]["color"] = "crimson"
                 elif (G2.has_edge(v, u) and G2[v][u].get("type") == "undirected"):
-                    G1_marked[u][v]["color"] = "green"
-                    G2_marked[v][u]["color"] = "green"
+                    G1_marked[u][v]["color"] = "crimson"
+                    G2_marked[v][u]["color"] = "crimson"
 
         return G1_marked, G2_marked
 
