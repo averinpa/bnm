@@ -525,7 +525,7 @@ class BNMetrics:
 
             for u, v, attrs in graph.edges(data=True):
                 edge_type = attrs.get("type", "directed")
-                edge_color = "green" if attrs.get("color") == "green" else None
+                edge_color = "crimson" if attrs.get("color") == "crimson" else None
 
                 if edge_type == "undirected":
                     dot.edge(str(u), str(v), dir="none", style="solid", color=edge_color)
