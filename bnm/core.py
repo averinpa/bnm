@@ -88,6 +88,13 @@ class BNMetrics:
             self.G1 = self._convert_to_digraph(G1, node_names, name="G1")
             self.G2 = self._convert_to_digraph(G2, node_names, name="G2")
 
+        # Case: G1 is matrix and G2 is None
+        elif isinstance(G1, (np.ndarray, list)) and G2 is None:
+            if node_names is None:
+                raise ValueError("node_names must be provided when G1 is a matrix and G2 is None.")
+            self.G1 = self._convert_to_digraph(G1, node_names, name="G1")
+            self.G2 = None
+
         # Case: both are DiGraphs → just validate and process
         elif isinstance(G1, nx.DiGraph) and (G2 is None or isinstance(G2, nx.DiGraph)):
             self.G1 = mark_and_collapse_bidirected_edges(G1)
