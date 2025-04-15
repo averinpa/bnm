@@ -12,7 +12,7 @@ from bnm import metrics as m
 
 
 class BNMetrics:
-    def __init__(self, G1, G2=None, node_names=None):
+    def __init__(self, G1, G2=None, node_names=None, mb_nodes='All'):
         """
         The `BNMetrics` class computes and compares descriptive and comparative 
         metrics between one or two Bayesian networks (DAGs), with support for 
@@ -68,7 +68,7 @@ class BNMetrics:
 
         self.G1_raw = G1
         self.G2_raw = G2
-
+        self.mb_nodes = mb_nodes
         # Case: G1 is DiGraph and G2 is matrix → extract node names from G1
         if isinstance(G1, nx.DiGraph) and isinstance(G2, (np.ndarray, list)):
             inferred_node_names = list(G1.nodes)
@@ -111,9 +111,9 @@ class BNMetrics:
 
         # Build internal graph dictionary
         if self.G2 is not None:
-            self.graph_dict = self._build_graph_dict_two_graphs(self.G1, self.G2)
+            self.graph_dict = self._build_graph_dict_two_graphs(self.G1, self.G2, self.mb_nodes)
         else:
-            self.graph_dict = self._build_graph_dict_one_graph(self.G1)
+            self.graph_dict = self._build_graph_dict_one_graph(self.G1, self.mb_nodes)
 
     def _convert_to_digraph(self, G, node_names, name="G"):
         """
@@ -142,13 +142,17 @@ class BNMetrics:
         else:
             raise TypeError(f"{name} must be a networkx.DiGraph, numpy.ndarray, or list of lists.")
 
-    def _build_graph_dict_two_graphs(self, G1, G2):
+    def _build_graph_dict_two_graphs(self, G1, G2, mb_nodes):
         """
         Internal method to construct dictionary of MB subgraphs.
         """
         graph_dict = {}
+        if mb_nodes == 'All':
+            mb_nodes_to_analyze = ['All'] + list(G1.nodes())
+        else:
+            mb_nodes_to_analyze = ['All'] + mb_nodes
 
-        for i in ['All'] + list(G1.nodes()):
+        for i in mb_nodes_to_analyze:
             graph_dict[i] = {'d1': '', 'd2': '', 'd3': ''}
 
             if i == 'All':
@@ -168,13 +172,18 @@ class BNMetrics:
 
         return graph_dict
     
-    def _build_graph_dict_one_graph(self, G1):
+    def _build_graph_dict_one_graph(self, G1, mb_nodes):
         """
         Internal method to construct dictionary of MB subgraphs.
         """
         graph_dict = {}
 
-        for i in ['All'] + list(G1.nodes()):
+        if mb_nodes == 'All':
+            mb_nodes_to_analyze = ['All'] + list(G1.nodes())
+        else:
+            mb_nodes_to_analyze = ['All'] + mb_nodes
+
+        for i in mb_nodes_to_analyze:
             graph_dict[i] = {'d1': ''}
 
             if i == 'All':
