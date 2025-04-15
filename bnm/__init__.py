@@ -9,3 +9,4 @@ Author: Pavel Averin
 from .core import BNMetrics
 from .utils import generate_random_dag
 from .utils import dag_to_cpdag
+from . viz.py import compare_models_descriptive
