@@ -182,7 +182,6 @@ def compare_models_comparative(
     list_of_dags,
     model_names,
     node_names,
-    list_of_nodes,
     metric,
     mb_nodes
     ):
@@ -197,8 +196,6 @@ def compare_models_comparative(
         List of model names corresponding to each DAG.
     node_names : list
         List of all node names in the DAGs.
-    list_of_nodes : list
-        List of nodes for which comparison metrics will be evaluated.
     metric : str, optional
         The comparison metric to compute (default is 'hd').
     mb_nodes : list, optional
