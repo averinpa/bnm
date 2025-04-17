@@ -217,3 +217,80 @@ def compare_models_comparative(
 
     combined_df = pd.concat(all_comparisons)
     plot_heatmap(combined_df, metric)
+
+
+def plot_mb(df):
+    """
+    Create a grid of bar plots showing value counts for each column in the input DataFrame.
+    Y-axis is labeled on the 4th subplot; X-axis on the 8th subplot.
+    
+    Parameters:
+    -----------
+    df : pandas.DataFrame
+        A DataFrame where each column represents a discrete metric to be visualized.
+    """
+    n_rows, n_cols = 3, 4
+    numeric_cols = df.columns[:n_rows * n_cols]
+
+    fig = make_subplots(
+        rows=n_rows,
+        cols=n_cols,
+        subplot_titles=numeric_cols,
+        vertical_spacing=0.1
+    )
+
+    for i, col in enumerate(numeric_cols):
+        row = i // n_cols + 1
+        col_idx = i % n_cols + 1
+
+        counts = df[col].value_counts().sort_index()
+
+        fig.add_trace(
+            go.Bar(
+                x=counts.index.astype(int).astype(str),
+                y=counts.values,
+                marker=dict(color='#1E3A8A'),
+                name=col
+            ),
+            row=row,
+            col=col_idx
+        )
+
+    fig.update_yaxes(title_text="Frequency", col=1)
+    fig.update_xaxes(title_text="Metric Value", row=3)
+
+    fig.update_layout(
+        height=800,
+        width=1200,
+        title_text="Exploration of Markov Blanket Space",
+        showlegend=False,
+        margin=dict(t=100),
+        font=dict(size=11)
+    )
+
+    fig.show()
+
+def analyse_mb(G1, node_names=None, mb_nodes='All'):
+    """
+    Analyze the Markov Blanket space of a BN object and plot descriptive metrics.
+    
+    Parameters:
+    -----------
+    G1 : bnlearn or other BN object
+        The Bayesian network graph.
+    node_names : list of str, optional
+        List of node names. Default is None.
+    mb_nodes : str or list, default 'All'
+        Nodes for which Markov blanket metrics should be computed.
+    
+    Returns:
+    --------
+    None
+        Displays a Plotly bar plot grid of descriptive metrics.
+    """
+    bnm_obj = BNMetrics(G1=G1, node_names=node_names, mb_nodes=mb_nodes)
+    
+    df = bnm_obj.compare_df(descriptive_metrics='All', comparison_metrics=None)
+    df = df.query("node_name != 'All'").drop(columns='node_name')
+    
+    plot_mb(df)
