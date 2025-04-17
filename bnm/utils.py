@@ -1,5 +1,7 @@
 import networkx as nx
 import random
+import pandas as pd
+import numpy as np
 
 def mark_and_collapse_bidirected_edges(graph):
     """
@@ -177,3 +179,35 @@ def dag_to_cpdag(dag):
             cpdag.add_edge(v, u)  # Make it bidirected
 
     return cpdag
+
+def generate_synthetic_data_from_dag(G, n_samples=1000, std=1.0, seed=None):
+    """
+    Generate synthetic data from a DAG using linear Gaussian SEM.
+    
+    Parameters:
+    - G: networkx.DiGraph — A DAG where each node is a variable.
+    - n_samples: int — Number of data samples to generate.
+    - noise_std: float — Standard deviation of the Gaussian noise.
+    - seed: int or None — Random seed for reproducibility.
+    
+    Returns:
+    - pd.DataFrame — A DataFrame containing the simulated dataset.
+    """
+    if seed is not None:
+        np.random.seed(seed)
+
+    nodes = list(nx.topological_sort(G))
+    data = pd.DataFrame(index=range(n_samples), columns=nodes)
+
+    weights = {} 
+
+    for node in nodes:
+        parents = list(G.predecessors(node))
+        if not parents:
+            data[node] = np.random.normal(0, 1, size=n_samples)
+        else:
+            weights[node] = {p: np.random.uniform(0.5, 1.5) for p in parents}
+            data[node] = sum(data[p] * w for p, w in weights[node].items()) + \
+                         np.random.normal(0, noise_std, size=n_samples)
+
+    return data
