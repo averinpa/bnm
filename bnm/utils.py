@@ -180,7 +180,7 @@ def dag_to_cpdag(dag):
 
     return cpdag
 
-def generate_synthetic_data_from_dag(G, n_samples=1000, std=1.0, seed=None):
+def generate_synthetic_data_from_dag(G, n_samples=1000, stdev=1.0, seed=None):
     """
     Generate synthetic data from a DAG using linear Gaussian SEM.
     
@@ -208,6 +208,6 @@ def generate_synthetic_data_from_dag(G, n_samples=1000, std=1.0, seed=None):
         else:
             weights[node] = {p: np.random.uniform(0.5, 1.5) for p in parents}
             data[node] = sum(data[p] * w for p, w in weights[node].items()) + \
-                         np.random.normal(0, noise_std, size=n_samples)
+                         np.random.normal(0, stdev, size=n_samples)
 
     return data
