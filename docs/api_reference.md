@@ -1,35 +1,51 @@
-# API Reference: BNM (Bayesian Network Metrics)<a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L14" style="float: right; font-weight: normal;">[source]</a>
+# API Reference: BNM (Bayesian Network Metrics)
+## Class BNMetrics<a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L14" style="float: right; font-weight: normal;">[source]</a>
+
+
+
+The `BNMetrics` class computes and compares descriptive and comparative metrics between one or two DAGs, with support for visualizations. It supports flexible input types including NetworkX graphs and adjacency matrices.
+
+---
+
+### Initialization
 
 ```python
-class BNMetrics(G1, G2=None, node_names=None)
+from bnm import BNMetrics
+
+model = BNMetrics(G1, G2=None, node_names=None, mb_nodes='All')
 ```
-
-The `BNMetrics` class computes and compares descriptive and comparative metrics between one or two Bayesian networks (DAGs), with support for visualization.
-
-Initialize a BNMetrics object with one or two DAGs. This class supports flexible input formats for causal structure comparison. The graphs can be provided either as `networkx.DiGraph` objects or as adjacency matrices (NumPy arrays or list-of-lists). If matrices are passed, `node_names` must also be provided to assign names to the nodes.
-
-All edges are processed to detect and mark bidirected edges as "undirected". Bidirected edges are collapsed into one edge. Directed edges are marked with "directed". Subgraphs for each node’s Markov blanket are computed and stored for downstream metric calculations and visualizations.
-
-## Parameters
+### Parameters
 
 **G1** : `nx.DiGraph`, `np.ndarray`, or `list of lists`  
-: The first graph (base DAG). If not a DiGraph, it must be a square adjacency matrix.
+: The first DAG (base DAG). If not a DiGraph, it must be a square adjacency matrix.
 
 **G2** : `nx.DiGraph`, `np.ndarray`, or `list of lists`, default=`None`  
-: The second graph (comparison DAG). Must have the same node names and structure 
-as `G1`. If not provided, BNMetrics operates in single-graph mode.
+: The second DAG (comparison DAG). Must have the same node names. If not provided, BNMetrics operates in single-DAG mode.
 
 **node_names** : `list of str`, optional  
-: Required only when `G1` or `G2` is given as a NumPy array or list of lists.
+: Required only when `G1`, `G2` or both are given as a NumPy array or list of lists.
 Length must match number of nodes.
+**mb_nodes**: `str` or `list`, default = `'All'`  
+  Nodes for which Markov blanket-based metrics and subgraphs will be computed.
 
-## Raises
+### Raises
 
 **ValueError**  
 - If `G1` or `G2` is not square when passed as a matrix.  
 - If `node_names` are missing or mismatched.  
-- If `G1` and `G2` have different node sets.
+- If `G1` and `G2` have different node sets.  
 
+**TypeError**  
+- If unsupported input types are provided for `G1` or `G2`.
+
+### Internal Behavior
+
+- Directed edges are processed to detect and **collapse bidirected pairs** into undirected arcs.
+- All edges are labeled as `"directed"` or `"undirected"` accordingly.
+- Subgraphs representing each node’s **Markov blanket** are computed and stored.
+- These subgraphs are used for calculating **local and global metrics** and for visualization.
+
+---
 ## Examples
 
 ```python
@@ -56,7 +72,7 @@ mat2 = np.array([[0, 0], [1, 0]])
 bnm = BNMetrics(mat1, mat2, node_names=["X1", "X2"])
 ```
 
-## `BNMetrics.compare_df`
+## `BNMetrics.compare_df`<a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L343" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 BNMetrics.compare_df(descriptive_metrics='All', comparison_metrics='All')
@@ -64,7 +80,7 @@ BNMetrics.compare_df(descriptive_metrics='All', comparison_metrics='All')
 
 Compile and merge descriptive and comparative metrics into a single table.
 
-### 🔢 Descriptive Metrics
+### Descriptive Metrics
 
 | Metric | Description
 |----------------------------------|--------------------------------------|
@@ -79,7 +95,7 @@ Compile and merge descriptive and comparative metrics into a single table.
 | `n_reversible_arcs`    | Directed edges not part of any collider|
 | `n_in_degree`          | Number of incoming edges|
 | `n_out_degree`         | Number of outgoing edges|
-### ⚖️ Comparative Metrics
+### Comparative Metrics
 
 | Metric         | Description|
 |----------------|------------|
@@ -98,58 +114,121 @@ Compile and merge descriptive and comparative metrics into a single table.
 
 ### Parameters
 
-- `descriptive_metrics` : `list[str]` or `'All'`, default=`'All'`
-- `comparison_metrics` : `list[str]` or `'All'`, default=`'All'`
+**descriptive_metrics** : `list[str]` or `'All'`, default=`'All'`  
+: List of descriptive metric names to compute, or "All" to include all available.
+            If None, descriptive metrics are not included.  
+**comparison_metrics** : `list[str]` or `'All'`, default=`'All'`  
+:  List of comparison metric names to compute, or "All" to include all available.
+            If None, comparison metrics are not included.
 
 ### Returns
 
-- `pandas.DataFrame` — Combined table with metrics.
+**pandas.DataFrame** — Combined table with metrics.  
+: A DataFrame with one row per node (including 'All' for global metrics).
+            Columns will depend on the selected metrics. Returns None if no valid metrics were specified.
 
 ### Example
 
 ```python
+from bnm import BNMetrics
+import networkx as nx
+G1 = nx.DiGraph()
+G1.add_edges_from([("A", "B"), ("B", "C")])
+G2 = nx.DiGraph()
+G2.add_edges_from([("A", "B"), ("C", "B")])
 bn = BNMetrics(G1, G2)
-df = bn.compare_df()
+df = bn.compare_df(
+    descriptive_metrics=["n_edges", "n_colliders"],
+    comparison_metrics=["shd", "tp", "fp"])
 ```
+| node_name | n_edges_base | n_edges | n_colliders_base | n_colliders | shd | tp | fp |
+|-----------|--------------|---------|------------------|-------------|-----|----|----|
+| All       | 2.0          | 2.0     | 0.0              | 1.0         | 1   | 1  | 1  |
+| A         | 1.0          | 2.0     | 0.0              | 1.0         | 1   | 1  | 1  |
+| B         | 2.0          | 2.0     | 0.0              | 1.0         | 1   | 1  | 1  |
+| C         | 1.0          | 2.0     | 0.0              | 1.0         | 2   | 0  | 2  |
 
 ---
 
-## `BNMetrics.compare_two_bn`
+## `BNMetrics.compare_two_bn`<a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L562" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 BNMetrics.compare_two_bn(nodes, option=1, name1='DAG1', name2='DAG2')
 ```
 
-Visualize two networks side-by-side, highlighting shared edges and selected nodes.
+ Visually compare two DAGs (G1 vs. G2) side-by-side using a subset of nodes.
+
+This method highlights:
+- True positive edges (present in both graphs) in green.
+- Selected nodes in green.
+- Edge types (directed or undirected) are preserved visually.
 
 ### Parameters
-- `nodes`: List of node names to highlight.
-- `option`: 1, 2, or 3 (controls subgraph selection strategy)
-- `name1`, `name2`: Graph titles.
+**nodes**: `list[str]`  
+: List of node names to include in the visualization. These must match node names in the DAGs. The subgraph containing these nodes and their Markov blankets will be extracted and visualized.  
+**option**: `int`, `default=1`   
+: Controls the visualization strategy:
+  - 1: Shows the Markov blanket subgraphs from G1 and G2 separately.  
+  - 2: Shows the same set of nodes in both graphs but renders edges from G2.  
+    This is useful for direct structural comparison between graphs.
+
+**name1**: `str`, `default="DAG1"`  
+: Title label for the first graph (usually the base or true DAG).  
+**name2**: `str`, `default="DAG2"`  
+: Title label for the second graph (typically the learned or comparison DAG).
+
+### Returns
+
+- `None`  
+  Displays two DAGs side-by-side using Graphviz within a Jupyter notebook environment.
 
 ### Example
 ```python
-bn.compare_two_bn(nodes=['X_1', 'X_2'])
+from bnm import BNMetrics
+import networkx as nx
+G1 = nx.DiGraph()
+G1.add_edges_from([("A", "B"), ("B", "C")])
+G2 = nx.DiGraph()
+G2.add_edges_from([("A", "B"), ("C", "B")])
+bn = BNMetrics(G1, G2)
+bn.compare_two_bn(nodes=['A', 'B'], option=1, name1='Original', name2='Modified')
 ```
 
 ---
 
-## `BNMetrics.plot_bn`
+## `BNMetrics.plot_bn`<a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L667" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 BNMetrics.plot_bn(nodes, layer="d1", title="DAG")
 ```
 
-Display a single DAG from one of the layers (`d1`, `d2`, or `d3`).
+ Plot a single DAG composed of merged Markov Blanket subgraphs for the specified nodes.  
+This method constructs a graph by merging subgraphs from a specific layer ('d1', 'd2', or 'd3') for each node in the list, highlights the selected nodes in green, and renders the network using Graphviz.
 
 ### Parameters
-- `nodes`: Nodes to highlight
-- `layer`: One of `'d1'`, `'d2'`, or `'d3'`
-- `title`: Title shown on the plot
+**nodes**: `list[str]`  
+: A list of node names (e.g., ['X_1', 'X_2', ...]) to extract subgraphs from `self.graph_dict`.  
+**layer**: `str`, `default="d1"`  
+The subgraph layer to visualize:
+- 'd1' : Markov Blanket from G1 (always available)
+- 'd2' : Markov Blanket from G2 (requires G2)
+- 'd3' : Subgraph from G2 using nodes from G1's MB (requires G2)  
+**title**: `str`, `default="DAG"`  
+:  Title displayed above the plotted graph.
+
+### Returns
+
+- `None`  
+  Displays a DAG using Graphviz within a Jupyter notebook environment.
 
 ### Example
 ```python
-bn.plot_bn(nodes=['X_1', 'X_5'], layer='d1', title='Markov Blanket')
+from bnm import BNMetrics
+import networkx as nx
+G1 = nx.DiGraph()
+G1.add_edges_from([("A", "B"), ("B", "C")])
+bn = BNMetrics(G1)
+bn.plot_bn(nodes=['A', 'B'], layer='d1', title='Markov Blanket')
 ```
 
 ---
