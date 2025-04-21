@@ -168,14 +168,13 @@ This method highlights:
 : List of node names to include in the visualization. These must match node names in the DAGs. The subgraph containing these nodes and their Markov blankets will be extracted and visualized.  
 **option**: `int`, `default=1`   
 : Controls the visualization strategy:
-  - 1: Shows the Markov blanket subgraphs from G1 and G2 separately.  
-  - 2: Shows the same set of nodes in both graphs but renders edges from G2.  
-    This is useful for direct structural comparison between graphs.
+  - 1: Shows the Markov blankets from G1 and G2 side-by-side.  
+  - 2: Shows the Merkov blanket from G1 and the same set of nodes in G2.
 
 **name1**: `str`, `default="DAG1"`  
-: Title label for the first graph (usually the base or true DAG).  
+: Title label for the first graph.  
 **name2**: `str`, `default="DAG2"`  
-: Title label for the second graph (typically the learned or comparison DAG).
+: Title label for the second graph.
 
 ### Returns
 
@@ -232,6 +231,34 @@ bn.plot_bn(nodes=['A', 'B'], layer='d1', title='Markov Blanket')
 ```
 
 ---
+
+## `compare_models_descriptive`
+
+```python
+compare_models_descriptive(list_of_dags, 
+                            model_names, 
+                            node_names, 
+                            mb_nodes)
+```
+
+Compares multiple models using descriptive metrics and plot the results.
+
+### Parameters  
+
+**list_of_dags**: `list[nx.DiGraph]`, `list[np.ndarray]` or `list[list of lists]`  
+: A list of DAGs to compare.  
+**model_names**: `list`  
+: A list of model names corresponding to list_of_dags.  
+**node_names**: `list`
+: A list of all node names in the associated with a DAG.
+**mb_nodes**: `list`
+: A list of nodes to compute Markov blanket-based descriptive metrics for.
+
+
+
+---
+
+
 
 ## `generate_random_dag`
 
