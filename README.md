@@ -12,7 +12,7 @@ Originally developed as [DAGMetrics](https://github.com/averinpa/DAGMetrics) in 
 - **Comparative Metrics**: Quantify similarity between DAGs using metrics like Structural Hamming Distance (SHD), Hamming Distance (HD), true/false positives, F1 score, and others.
 - **Local Structure Analysis**: Explore and compare the Markov blankets of selected nodes to understand the structure of a system at a granular level.
 - **Visual Comparisons**: Generate side-by-side visualizations of DAGs, highlighting shared edges.
-- **Batch Evaluation**: Compare multiple models (e.g., from different algorithm runs or hyperparameter settings) to assess model stability and complexity.
+- **Model Evaluation**: Compare multiple models (e.g., from different algorithm runs or hyperparameter settings) to assess model stability and complexity.
 
 ---
 
