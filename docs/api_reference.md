@@ -232,7 +232,7 @@ bn.plot_bn(nodes=['A', 'B'], layer='d1', title='Markov Blanket')
 
 ---
 
-## `compare_models_descriptive`
+## `compare_models_descriptive`                                 <a href="https://github.com/averinpa/bnm/blob/main/bnm/viz.py#L81" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 compare_models_descriptive(list_of_dags, 
@@ -241,7 +241,7 @@ compare_models_descriptive(list_of_dags,
                             mb_nodes)
 ```
 
-Compares multiple models using descriptive metrics and plot the results.
+Calculates descriptive metrics—including number of edges, colliders, root nodes, leaf nodes, isolated nodes, directed arcs, undirected arcs, and reversible arcs—for the global structure and specified Markov blankets. The results are displayed in eight interactive subplots, with a dropdown menu allowing selection of the Markov blanket of interest.
 
 ### Parameters  
 
@@ -254,42 +254,104 @@ Compares multiple models using descriptive metrics and plot the results.
 **mb_nodes**: `list`
 : A list of nodes to compute Markov blanket-based descriptive metrics for.
 
+### Returns
 
+- `None`  
+  Displays the descriptive metrics in eight interactive subplots
+
+### Example
+```python
+from bnm import compare_models_descriptive
+import networkx as nx
+G1 = nx.DiGraph()
+G1.add_edges_from([("A", "B"), ("B", "C")])
+G2 = nx.DiGraph()
+G2.add_edges_from([("A", "B"), ("A", "C")])
+compare_models_descriptive(list_of_dags=[G1, G2], 
+                            model_names=['Model1', 'Model2'], 
+                            node_names=list(G1.nodes), 
+                            mb_nodes=['A', 'B'])
+```
 
 ---
 
-
-
-## `generate_random_dag`
+## `compare_models_comparative`                                 <a href="https://github.com/averinpa/bnm/blob/main/bnm/viz.py#L181" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
-from bnm.utils import generate_random_dag
-G = generate_random_dag(n_nodes=50, edge_prob=0.1, seed=42)
+compare_models_comparative(list_of_dags, 
+                            model_names, 
+                            node_names,
+                            metric, 
+                            mb_nodes)
 ```
 
-Generate a random DAG based on topological ordering.
+Calculates a comparative metric—selected from additions, deletions, reversals, SHD, HD, TP, FN, FP, precision, recall, or F1 score—for the global structure and specified Markov blankets. The results are visualized in a heatmap comparing all pairs of models based on the chosen metric, with a dropdown menu for selecting the Markov blanket of interest.
 
-### Parameters
-- `n_nodes`: Number of nodes
-- `edge_prob`: Probability of edge creation (upper-triangle only)
-- `seed`: Random seed
+### Parameters  
+
+**list_of_dags**: `list[nx.DiGraph]`, `list[np.ndarray]` or `list[list of lists]`  
+: A list of DAGs to compare.  
+**model_names**: `list`  
+: A list of model names corresponding to list_of_dags.  
+**node_names**: `list`
+: A list of all node names in the associated with a DAG.
+**metric**: `str`
+: metric to be calculated. Choices are additions, deletions, reversals, shd, hd, tp, fn, fp, precision, recall, or f1_score
+**mb_nodes**: `list`
+: A list of nodes to compute Markov blanket-based comparative metric for.
 
 ### Returns
-- `networkx.DiGraph`: Random DAG with nodes named `X_1`, `X_2`, ...
 
+- `None`  
+  Displays the heatmap comparing all pairs of models
+
+### Example
+```python
+from bnm import compare_models_comparative
+import networkx as nx
+G1 = nx.DiGraph()
+G1.add_edges_from([("A", "B"), ("B", "C")])
+G2 = nx.DiGraph()
+G2.add_edges_from([("A", "B"), ("A", "C")])
+compare_models_comparative(list_of_dags=[G1, G2], 
+                            model_names=['Model1', 'Model2'], 
+                            node_names=list(G1.nodes), 
+                            metric='shd',
+                            mb_nodes=['A', 'B'])
+```
+## `analyse_mb`                                 <a href="https://github.com/averinpa/bnm/blob/main/bnm/viz.py#273" style="float: right; font-weight: normal;">[source]</a>
+
+```python
+analyse_mb(G1, node_names=None, mb_nodes='All')
+```
+
+Analyze the Markov Blanket space of a DAG and plot distribution of descriptive metrics.
+
+### Parameters  
+
+**G1** : `nx.DiGraph`, `np.ndarray`, or `list of lists`  
+: The first DAG (base DAG). If not a DiGraph, it must be a square adjacency matrix.
+**node_names** : `list of str`, optional  
+: Required only when `G1`is a NumPy array or list of lists.
+Length must match number of nodes.  
+**mb_nodes**: `str` or `list`, default = `'All'`  
+  Nodes for which Markov blanket-based metrics and subgraphs will be computed.
+
+### Returns
+
+- `None`  
+  Displays the distibution of descriptive metrics in eight interactive subplots
+
+### Example
+```python
+from bnm import analyse_mb
+import networkx as nx
+G1 = nx.DiGraph()
+G1.add_edges_from([("A", "B"), ("B", "C")])
+analyse_mb(G1, node_names=None, mb_nodes='All')
+```
 ---
-
-## `dag_to_cpdag`
-
-```python
-from bnm.utils import dag_to_cpdag
-cpdag = dag_to_cpdag(G)
-```
-
-Convert a DAG to its CPDAG skeleton (preserving colliders and undirected edges).
-
-### Parameters
-- `G`: `networkx.DiGraph`
-
-### Returns
-- `networkx.DiGraph` CPDAG-like structure
+## Use Cases: 
+- [Evaluate Single DAG](https://github.com/averinpa/bnm/blob/main/use%20cases/evaluate%20single%20DAG.ipynb)
+- [Compare Two DAGs](https://github.com/averinpa/bnm/blob/main/use%20cases/compare%20two%20DAGs.ipynb)
+- [Use Case: Compare Algorithms](https://github.com/averinpa/bnm/blob/main/use%20cases/compare%20algorithms.ipynb)

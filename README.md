@@ -2,7 +2,7 @@
 
 **BNM** is a Python package for evaluating, comparing, and visualizing DAGs. It provides an intuitive interface for exploring both global and local graph structures, offering a rich set of metrics and visual tools. 
 
-Originally developed as [DAGMetrics](https://github.com/averinpa/DAGMetrics) in R for analyzing Bayesian Networks in microbial abundance data [(Averin et al., 2025)](https://doi.org/10.3390/agronomy15040987), **BNM** is the Python implementation that expands this functionality.
+Originally developed as [DAGMetrics](https://github.com/averinpa/DAGMetrics) in R for analyzing Bayesian Networks in microbial abundance data [(Averin et al., 2025)](https://doi.org/10.3390/agronomy15040987), **BNM** is the Python implementation of DAGMetrics with extended functionality.
 
 
 ---
