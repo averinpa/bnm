@@ -14,40 +14,44 @@ from bnm import metrics as m
 class BNMetrics:
     def __init__(self, G1, G2=None, node_names=None, mb_nodes='All'):
         """
-        The `BNMetrics` class computes and compares descriptive and comparative 
-        metrics between one or two Bayesian networks (DAGs), with support for 
-        visualization.
-
-        Initialize a BNMetrics object with one or two DAGs. 
-        This class supports flexible input formats for causal structure comparison. 
-        The graphs can be provided either as `networkx.DiGraph` objects or as 
-        adjacency matrices (NumPy arrays or list-of-lists). If matrices are 
-        passed, `node_names` must also be provided to assign names to the nodes.
-
-        All edges are processed to detect and mark bidirected edges as "undirected". 
-        Bidirected edges are collapsed into one edge. Directed edges are marked 
-        with "directed". Subgraphs for each node’s Markov blanket are computed and 
-        stored for downstream metric calculations and visualizations.
+        The BNMetrics class calculates and compares descriptive and comparative metrics 
+        for one or two DAGs, with support for visualizations. It supports flexible input 
+        types including NetworkX DiGraph and adjacency matrices.
 
         Parameters
         ----------
-        G1 : nx.DiGraph or np.ndarray or list of lists
-            The first graph (base DAG). If not a DiGraph, it must be a square adjacency matrix.
+        G1 : nx.DiGraph, np.ndarray, or list of lists
+            The first DAG. If not a DiGraph, it must be a square adjacency matrix.
 
-        G2 : nx.DiGraph or np.ndarray or list of list, optional
-            The second graph (comparison DAG). Must have the same node names and structure 
-            as G1. If not provided, BNMetrics operates in single-graph mode.
+        G2 : nx.DiGraph, np.ndarray, or list of lists, optional (default=None)
+            The second DAG. Must have the same node names. If not provided, BNMetrics 
+            operates in single-DAG mode.
 
         node_names : list of str, optional
-            Required only when G1 and G2 is given as a NumPy array or list of lists.
+            Required only when G1, G2 or both are given as a NumPy array or list of lists. 
             Length must match number of nodes.
+
+        mb_nodes : str or list, default='All'
+            Nodes for which Markov blanket-based metrics and subgraphs will be computed.
 
         Raises
         ------
         ValueError
-            If G1 or G2 is not square when provided as a matrix.
-            If node_names are missing or do not match the number of nodes.
-            If G1 and G2 do not share the same set of node names.
+            - If G1 or G2 is not square when passed as a matrix.
+            - If node_names are missing or mismatched.
+            - If G1 and G2 have different node sets.
+
+        TypeError
+            - If unsupported input types are provided for G1 or G2.
+
+        Internal Behavior
+        -----------------
+        - Edges are processed to detect bidirected edges and bidirected pairs into 
+        undirected edges.
+        - All edges are labeled as "directed" or "undirected" accordingly.
+        - Subgraphs representing each node’s Markov blanket are computed and stored.
+        - These subgraphs are used for calculating local and global metrics and for 
+        visualization.
 
         Examples
         --------
@@ -57,13 +61,12 @@ class BNMetrics:
         >>> G1.add_edges_from([("A", "B"), ("C", "B")])
         >>> G2 = nx.DiGraph()
         >>> G2.add_edges_from([("A", "B"), ("B", "C")])
-        >>> model = BNMetrics(G1, G2)
+        >>> bnm = BNMetrics(G1, G2)
 
-        >>> # With NumPy arrays
         >>> import numpy as np
         >>> mat1 = np.array([[0, 1], [0, 0]])
         >>> mat2 = np.array([[0, 0], [1, 0]])
-        >>> model = BNMetrics(mat1, mat2, node_names=["X1", "X2"])
+        >>> bnm = BNMetrics(mat1, mat2, node_names=["X1", "X2"])
         """
 
         self.G1_raw = G1

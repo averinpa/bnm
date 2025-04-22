@@ -3,7 +3,7 @@
 
 
 
-The `BNMetrics` class computes and compares descriptive and comparative metrics between one or two DAGs, with support for visualizations. It supports flexible input types including NetworkX graphs and adjacency matrices.
+The `BNMetrics` class calculates and compares descriptive and comparative metrics for one or two DAGs, with support for visualizations. It supports flexible input types including NetworkX DiGraph and adjacency matrices.
 
 ---
 
@@ -12,15 +12,15 @@ The `BNMetrics` class computes and compares descriptive and comparative metrics 
 ```python
 from bnm import BNMetrics
 
-model = BNMetrics(G1, G2=None, node_names=None, mb_nodes='All')
+bnm_obj = BNMetrics(G1, G2=None, node_names=None, mb_nodes='All')
 ```
 ### Parameters
 
 **G1** : `nx.DiGraph`, `np.ndarray`, or `list of lists`  
-: The first DAG (base DAG). If not a DiGraph, it must be a square adjacency matrix.
+: The first DAG. If not a DiGraph, it must be a square adjacency matrix.
 
 **G2** : `nx.DiGraph`, `np.ndarray`, or `list of lists`, default=`None`  
-: The second DAG (comparison DAG). Must have the same node names. If not provided, BNMetrics operates in single-DAG mode.
+: The second DAG. Must have the same node names. If not provided, BNMetrics operates in single-DAG mode.
 
 **node_names** : `list of str`, optional  
 : Required only when `G1`, `G2` or both are given as a NumPy array or list of lists.
@@ -40,10 +40,10 @@ Length must match number of nodes.
 
 ### Internal Behavior
 
-- Directed edges are processed to detect and **collapse bidirected pairs** into undirected arcs.
+- Edges are processed to detect bidirected edges and bidirected pairs into undirected edges.
 - All edges are labeled as `"directed"` or `"undirected"` accordingly.
-- Subgraphs representing each node’s **Markov blanket** are computed and stored.
-- These subgraphs are used for calculating **local and global metrics** and for visualization.
+- Subgraphs representing each node’s Markov blanket are computed and stored.
+- These subgraphs are used for calculating local and global metrics and for visualization.
 
 ---
 ## Examples
