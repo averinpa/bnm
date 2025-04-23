@@ -72,7 +72,7 @@ mat2 = np.array([[0, 0], [1, 0]])
 bnm = BNMetrics(mat1, mat2, node_names=["X1", "X2"])
 ```
 
-## `BNMetrics.compare_df`                       <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L347" style="float: right; font-weight: normal;">[source]</a>
+## BNMetrics.compare_df                       <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L347" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 BNMetrics.compare_df(descriptive_metrics='All', comparison_metrics='All')
@@ -156,7 +156,7 @@ df = bn.compare_df(
 
 ---
 
-## `BNMetrics.compare_two_bn`                       <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L562" style="float: right; font-weight: normal;">[source]</a>
+## BNMetrics.compare_two_bn                       <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L562" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 BNMetrics.compare_two_bn(nodes, option=1, name1='DAG1', name2='DAG2')
@@ -165,7 +165,7 @@ BNMetrics.compare_two_bn(nodes, option=1, name1='DAG1', name2='DAG2')
  Visually compare two DAGs (G1 vs. G2) side-by-side using a subset of nodes.
 
 This method highlights:
-- True positive edges (present in both graphs) in green.
+- True positive edges (present in both graphs) in red.
 - Selected nodes in green.
 - Edge types (directed or undirected) are preserved visually.
 
@@ -178,15 +178,18 @@ This method highlights:
   - 2: Shows the Merkov blanket from G1 and the same set of nodes in G2.
 
 **name1**: `str`, `default="DAG1"`  
-: Title label for the first graph.  
+: Title to display above the first graph (G1).  
 **name2**: `str`, `default="DAG2"`  
-: Title label for the second graph.
+: Title to display above the second graph (G2).
 
 ### Returns
 
 - `None`  
   Displays two DAGs side-by-side using Graphviz within a Jupyter notebook environment.
 
+### Raises
+**ValueError**  
+- If no second graph (G2) was provided during initialization.
 ### Example
 ```python
 from bnm import BNMetrics
@@ -201,7 +204,7 @@ bn.compare_two_bn(nodes=['A', 'B'], option=1, name1='Original', name2='Modified'
 
 ---
 
-## `BNMetrics.plot_bn`                      <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L667" style="float: right; font-weight: normal;">[source]</a>
+## BNMetrics.plot_bn                      <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L667" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 BNMetrics.plot_bn(nodes, layer="d1", title="DAG")
@@ -225,6 +228,10 @@ The subgraph layer to visualize:
 
 - `None`  
   Displays a DAG using Graphviz within a Jupyter notebook environment.
+
+### Raises
+**ValueError** 
+- If `layer` is 'd2' or 'd3' but no second graph (G2) was provided during initialization.
 
 ### Example
 ```python

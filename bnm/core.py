@@ -580,19 +580,20 @@ class BNMetrics:
         Visually compare two DAGs (G1 vs. G2) side-by-side using a subset of nodes.
 
         This method highlights:
-        - True positive edges (present in both graphs) in green.
+        - True positive edges (present in both graphs) in red.
         - Selected nodes in green.
         - Edge types (directed or undirected) are preserved visually.
 
         Parameters
         ----------
         nodes : list of str
-            List of node names to include in the visualization. Use node names from the DAGs.
+            List of node names to include in the visualization. These must match node names in the DAGs. 
+            The subgraph containing these nodes and their Markov blankets will be extracted and visualized.
 
         option : int, default=1
-            Determines which layer to visualize:
-            - 1: Use the full Markov blanket subgraph (d1 and d2).
-            - 2: Use d3 layer (nodes from d1 but edges from d2). Intended for structure comparison.
+            Controls the visualization strategy:
+            - 1: Shows the Markov blankets from G1 and G2 side-by-side.  
+            - 2: Shows the Merkov blanket from G1 and the same set of nodes in G2.
 
         name1 : str, default="DAG1"
             Title to display above the first graph (G1).
@@ -603,7 +604,7 @@ class BNMetrics:
         Returns
         -------
         None
-            Displays two graph visualizations side-by-side using Graphviz in Jupyter.
+            Displays two graph visualizations side-by-side using Graphviz within a Jupyter notebook environment.
 
         Raises
         ------
@@ -612,8 +613,14 @@ class BNMetrics:
 
         Example
         -------
+        >>> from bnm import BNMetrics
+        >>> import networkx as nx
+        >>> G1 = nx.DiGraph()
+        >>> G1.add_edges_from([("A", "B"), ("B", "C")])
+        >>> G2 = nx.DiGraph()
+        >>> G2.add_edges_from([("A", "B"), ("C", "B")])
         >>> bn = BNMetrics(G1, G2)
-        >>> bn.compare_two_bn(nodes=['X_1', 'X_5', 'X_10'], option=2, name1='Original', name2='Modified')
+        >>> bn.compare_two_bn(nodes=['A', 'B'], option=1, name1='Original', name2='Modified')
         """
         if self.G2 is not None:
             G1, G2 = self._mark_true_positives_color_both(nodes, option)
@@ -705,7 +712,7 @@ class BNMetrics:
         Returns
         -------
         None
-            Displays the graph inline in Jupyter using Graphviz.
+            Displays a DAG using Graphviz within a Jupyter notebook environment.
 
         Raises
         ------
@@ -714,11 +721,12 @@ class BNMetrics:
 
         Example
         -------
+        >>> from bnm import BNMetrics
+        >>> import networkx as nx
+        >>> G1 = nx.DiGraph()
+        >>> G1.add_edges_from([("A", "B"), ("B", "C")])
         >>> bn = BNMetrics(G1)
-        >>> bn.plot_bn(nodes=['X_1', 'X_2'], layer='d1', title="Local Structure")
-
-        >>> bn = BNMetrics(G1, G2)
-        >>> bn.plot_bn(nodes=['X_3'], layer='d3', title="Comparison MB Overlay")
+        >>> bn.plot_bn(nodes=['A', 'B'], layer='d1', title='Markov Blanket')
         """
             
         if self.G2 is None and layer in ['d2', 'd3']:
