@@ -72,7 +72,7 @@ mat2 = np.array([[0, 0], [1, 0]])
 bnm = BNMetrics(mat1, mat2, node_names=["X1", "X2"])
 ```
 
-## `BNMetrics.compare_df`                       <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L343" style="float: right; font-weight: normal;">[source]</a>
+## `BNMetrics.compare_df`                       <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L347" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 BNMetrics.compare_df(descriptive_metrics='All', comparison_metrics='All')
@@ -129,7 +129,7 @@ If None, comparison metrics are not included.
 
 ### Returns
 
-**pd.DataFrame** or **None**
+**pd.DataFrame** or **None**  
 : A DataFrame with one row per node (including 'All' for global metrics).
 Columns will depend on the selected metrics. Returns None if no valid metrics were specified.
 
