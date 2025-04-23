@@ -156,7 +156,7 @@ df = bn.compare_df(
 
 ---
 
-## BNMetrics.compare_two_bn                       <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L562" style="float: right; font-weight: normal;">[source]</a>
+## BNMetrics.compare_two_bn                       <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L578" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 BNMetrics.compare_two_bn(nodes, option=1, name1='DAG1', name2='DAG2')
@@ -204,7 +204,7 @@ bn.compare_two_bn(nodes=['A', 'B'], option=1, name1='Original', name2='Modified'
 
 ---
 
-## BNMetrics.plot_bn                      <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L667" style="float: right; font-weight: normal;">[source]</a>
+## BNMetrics.plot_bn                      <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L690" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 BNMetrics.plot_bn(nodes, layer="d1", title="DAG")
