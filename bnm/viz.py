@@ -80,21 +80,44 @@ def plot_descriptive(df):
 
 def compare_models_descriptive(list_of_dags, model_names, node_names, mb_nodes):
     """
-    Compare multiple DAG models on descriptive metrics and plot the results.
-
+    Calculates descriptive metrics—including number of edges, colliders, root nodes, 
+    leaf nodes, isolated nodes, directed arcs, undirected arcs, and reversible arcs—for the 
+    global structure and specified Markov blankets. The results are displayed in eight 
+    interactive subplots, with a dropdown menu allowing selection of the Markov blanket of interest.
+    
     Parameters
     ----------
     list_of_dags : list
         A list of DAGs (as networkx.DiGraph) to compare.
 
     model_names : list
-        A list of model names corresponding to list_of_dags (e.g., alpha values).
+        A list of model names corresponding to list_of_dags.
 
     node_names : list
         List of all node names in the DAGs.
 
     mb_nodes : list
         List of nodes to compute Markov blanket-based descriptive metrics for.
+    
+    Returns
+        -------
+        None
+            Displays the descriptive metrics in eight interactive subplots
+
+        
+    Example
+    -------
+    >>> from bnm import compare_models_descriptive
+    >>> import networkx as nx
+    >>> G1 = nx.DiGraph()
+    >>> G1.add_edges_from([("A", "B"), ("B", "C")])
+    >>> G2 = nx.DiGraph()
+    >>> G2.add_edges_from([("A", "B"), ("A", "C")])
+    >>> compare_models_descriptive(list_of_dags=[G1, G2], 
+        ...                model_names=['Model1', 'Model2'], 
+        ...                node_names=list(G1.nodes), 
+        ...                mb_nodes=['A', 'B'])
+    
     """
     list_of_df = []
     for i in range(len(list_of_dags)):
@@ -186,20 +209,48 @@ def compare_models_comparative(
     mb_nodes
     ):
     """
-    Compare all pairs of models and plot heatmaps of a specific comparison metric.
-
+    Calculates a comparative metric—selected from additions, 
+    deletions, reversals, SHD, HD, TP, FN, FP, precision, recall, or 
+    F1 score—for the global structure and specified Markov blankets. 
+    The results are visualized in a heatmap comparing all pairs of 
+    models based on the chosen metric, with a dropdown menu for 
+    selecting the Markov blanket of interest.
+    
     Parameters
     ----------
-    list_of_dags : list
-        List of learned DAGs to be compared.
+    list_of_dags : list[nx.DiGraph], list[np.ndarray] or list[list of lists]
+        List of DAGs to compare.
     model_names : list
-        List of model names corresponding to each DAG.
+        A list of model names corresponding to list_of_dags.
     node_names : list
-        List of all node names in the DAGs.
-    metric : str, optional
-        The comparison metric to compute (default is 'hd').
-    mb_nodes : list, optional
-        List of nodes for Markov blanket comparison. If None, defaults to list_of_nodes.
+        A list of all node names in the associated with a DAG.
+    metric : str
+        metric to be calculated. Choices are additions, deletions, 
+        reversals, shd, hd, tp, fn, fp, precision, recall, or f1_score
+    mb_nodes : list
+        A list of nodes to compute Markov blanket-based comparative metric for.
+    
+    
+    Returns
+        -------
+        None
+            Displays the heatmap comparing all pairs of models
+
+        
+    Example
+    -------
+    >>> from bnm import compare_models_comparative
+    >>> import networkx as nx
+    >>> G1 = nx.DiGraph()
+    >>> G1.add_edges_from([("A", "B"), ("B", "C")])
+    >>> G2 = nx.DiGraph()
+    >>> G2.add_edges_from([("A", "B"), ("A", "C")])
+    >>> compare_models_comparative(list_of_dags=[G1, G2], 
+        ...                        model_names=['Model1', 'Model2'], 
+        ...                        node_names=list(G1.nodes), 
+        ...                        metric='shd',
+        ...                        mb_nodes=['A', 'B'])
+    
     """
     all_comparisons = []
 
@@ -272,21 +323,33 @@ def plot_mb(df):
 
 def analyse_mb(G1, node_names=None, mb_nodes='All'):
     """
-    Analyze the Markov Blanket space of a BN object and plot descriptive metrics.
+    Analyze the Markov blanket space of a DAG and plot distribution 
+    of descriptive metrics.
     
     Parameters:
     -----------
-    G1 : bnlearn or other BN object
-        The Bayesian network graph.
+    G1 : nx.DiGraph, np.ndarray, or list of lists
+        The first DAG. If not a DiGraph, 
+        it must be a square adjacency matrix.
     node_names : list of str, optional
-        List of node names. Default is None.
-    mb_nodes : str or list, default 'All'
-        Nodes for which Markov blanket metrics should be computed.
+        Required only when G1, G2 or both are given as a NumPy array or list of lists. 
+        Length must match number of nodes.
+    mb_nodes : str or list, default='All'
+        Nodes for which Markov blanket-based metrics and subgraphs will be computed.
     
     Returns:
     --------
     None
-        Displays a Plotly bar plot grid of descriptive metrics.
+        Displays the distibution of descriptive metrics in eight interactive subplots
+    
+    Example
+    -------
+    >>> from bnm import analyse_mb
+    >>> import networkx as nx
+    >>> G1 = nx.DiGraph()
+    >>> G1.add_edges_from([("A", "B"), ("B", "C")])
+    >>> analyse_mb(G1, node_names=None, mb_nodes='All')
+    
     """
     bnm_obj = BNMetrics(G1=G1, node_names=node_names, mb_nodes=mb_nodes)
     
