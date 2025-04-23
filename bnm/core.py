@@ -346,12 +346,47 @@ class BNMetrics:
 
     def compare_df(self, descriptive_metrics="All", comparison_metrics="All"):
         """
-        Compile and return a merged DataFrame containing descriptive and/or comparison metrics
-        for each node (and global metrics under 'All').
-
+        Calculates and returns a DataFrame of descriptive and/or comparison metrics 
+        for the Markov blanket of each node, as well as global metrics under the label 'All'. 
+        
+        If only one graph is provided (G2 is None), only descriptive metrics can be computed.
+        
         This method supports flexible inclusion of:
-        - Descriptive metrics based on a single DAG or both DAGs
+        - Descriptive metrics computed from one or both DAGs
         - Comparative metrics when both DAGs are provided
+
+        ### Descriptive Metrics
+
+        | Metric | Description
+        |----------------------------------|--------------------------------------|
+        | `n_edges`              | Total number of edges|
+        | `n_nodes`              | Total number of nodes|
+        | `n_colliders`          | Number of collider structures (X → Z ← Y)|
+        | `n_root_nodes`         | Nodes with no parents or connected undirected edges|
+        | `n_leaf_nodes`         | Nodes with no children or connected undirected edges|
+        | `n_isolated_nodes`     | Nodes with no connected edges|
+        | `n_directed_arcs`      | Number of directed edges|
+        | `n_undirected_arcs`    | Number of undirected edges|
+        | `n_reversible_arcs`    | Directed edges not part of any collider|
+        | `n_in_degree`          | Number of incoming edges|
+        | `n_out_degree`         | Number of outgoing edges|
+        
+        ### Comparative Metrics
+
+        | Metric         | Description|
+        |----------------|------------|
+        | `additions`    | Edges present in G2 but not in G1 (ignoring direction)|
+        | `deletions`    | Edges present in G1 but not in G2 (ignoring direction)|
+        | `reversals`    | Directed edges that were reversed or became undirected|
+        | `shd`          | Structural Hamming Distance (additions + deletions + reversals)|
+        | `hd`           | Hamming Distance (additions + deletions only)|
+        | `tp`           | Edges presented in two graphs|
+        | `fp`           | Edges in G2 not in G1|
+        | `fn`           | Missing edges in G2 that were in G1|
+        | `precision`    | TP / (TP + FP)|
+        | `recall`       | TP / (TP + FN)|
+        | `f1_score`     | Harmonic mean of precision and recall|
+
 
         Parameters
         ----------
@@ -369,38 +404,8 @@ class BNMetrics:
             A DataFrame with one row per node (including 'All' for global metrics).
             Columns will depend on the selected metrics. Returns None if no valid metrics were specified.
 
-        Notes
-        -----
-        Descriptive metrics (available with one or two graphs):
-        - 'n_edges': Number of edges
-        - 'n_nodes': Number of nodes
-        - 'n_colliders': Number of collider structures
-        - 'n_root_nodes': Root nodes (no parents)
-        - 'n_leaf_nodes': Leaf nodes (no children)
-        - 'n_isolated_nodes': Nodes with no edges
-        - 'n_directed_arcs': Number of directed edges
-        - 'n_undirected_arcs': Number of undirected edges
-        - 'n_reversible_arcs': Directed edges not involved in colliders
-        - 'n_in_degree': In-degree (only for individual nodes)
-        - 'n_out_degree': Out-degree (only for individual nodes)
 
-        Comparative metrics (requires both graphs):
-        - 'additions': Edges in G2 but not in G1
-        - 'deletions': Edges in G1 but not in G2
-        - 'reversals': Reversed edges or edge type changes
-        - 'shd': Structural Hamming Distance
-        - 'hd': Hamming Distance (additions + deletions only)
-        - 'tp': True Positives
-        - 'fp': False Positives
-        - 'fn': False Negatives
-        - 'precision': Precision = TP / (TP + FP)
-        - 'recall': Recall = TP / (TP + FN)
-        - 'f1_score': F1 score = 2 * (precision * recall) / (precision + recall)
-
-        Behavior
-        --------
-        - If only one graph is provided (G2 is None), only descriptive metrics can be computed.
-        - If no valid metrics are specified, the method prints a warning and returns None.
+        
 
         Example
         -------
@@ -416,6 +421,13 @@ class BNMetrics:
         ...     comparison_metrics=["shd", "tp", "fp"]
         ... )
         >>> print(df)
+
+        | node_name | n_edges_base | n_edges | n_colliders_base | n_colliders | shd | tp | fp |
+        |-----------|--------------|---------|------------------|-------------|-----|----|----|
+        | All       | 2.0          | 2.0     | 0.0              | 1.0         | 1   | 1  | 1  |
+        | A         | 1.0          | 2.0     | 0.0              | 1.0         | 1   | 1  | 1  |
+        | B         | 2.0          | 2.0     | 0.0              | 1.0         | 1   | 1  | 1  |
+        | C         | 1.0          | 2.0     | 0.0              | 1.0         | 2   | 0  | 2  |
         """
         if self.G2 is not None:
             if descriptive_metrics is None and comparison_metrics is None:

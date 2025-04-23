@@ -78,7 +78,13 @@ bnm = BNMetrics(mat1, mat2, node_names=["X1", "X2"])
 BNMetrics.compare_df(descriptive_metrics='All', comparison_metrics='All')
 ```
 
-Compile and merge descriptive and comparative metrics into a single table.
+Calculates and returns a DataFrame of descriptive and/or comparison metrics for the Markov blanket of each node, as well as global metrics under the label 'All'.  
+
+If only one graph is provided (G2 is None), only descriptive metrics can be computed.
+
+This method supports flexible inclusion of:  
+- Descriptive metrics computed from one or both DAGs  
+- Comparative metrics when both DAGs are provided
 
 ### Descriptive Metrics
 
@@ -109,23 +115,23 @@ Compile and merge descriptive and comparative metrics into a single table.
 | `fn`           | Missing edges in G2 that were in G1|
 | `precision`    | TP / (TP + FP)|
 | `recall`       | TP / (TP + FN)|
-| `f1_score`     | Harmonic mean of precision and recall
-|
+| `f1_score`     | Harmonic mean of precision and recall|
+
 
 ### Parameters
 
-**descriptive_metrics** : `list[str]` or `'All'`, default=`'All'`  
+**descriptive_metrics** : `list[str]`, `'All'` or `None`, default=`'All'`  
 : List of descriptive metric names to compute, or "All" to include all available.
-            If None, descriptive metrics are not included.  
-**comparison_metrics** : `list[str]` or `'All'`, default=`'All'`  
+If None, descriptive metrics are not included.  
+**comparison_metrics** : `list[str]`, `'All'` or `None`, default=`'All'`  
 :  List of comparison metric names to compute, or "All" to include all available.
-            If None, comparison metrics are not included.
+If None, comparison metrics are not included.
 
 ### Returns
 
-**pandas.DataFrame** — Combined table with metrics.  
+**pd.DataFrame** or **None**
 : A DataFrame with one row per node (including 'All' for global metrics).
-            Columns will depend on the selected metrics. Returns None if no valid metrics were specified.
+Columns will depend on the selected metrics. Returns None if no valid metrics were specified.
 
 ### Example
 
