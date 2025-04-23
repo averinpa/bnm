@@ -245,7 +245,7 @@ bn.plot_bn(nodes=['A', 'B'], layer='d1', title='Markov Blanket')
 
 ---
 
-## `compare_models_descriptive`                                 <a href="https://github.com/averinpa/bnm/blob/main/bnm/viz.py#L81" style="float: right; font-weight: normal;">[source]</a>
+## compare_models_descriptive                                 <a href="https://github.com/averinpa/bnm/blob/main/bnm/viz.py#L81" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 compare_models_descriptive(list_of_dags, 
@@ -288,7 +288,7 @@ compare_models_descriptive(list_of_dags=[G1, G2],
 
 ---
 
-## `compare_models_comparative`                                 <a href="https://github.com/averinpa/bnm/blob/main/bnm/viz.py#L181" style="float: right; font-weight: normal;">[source]</a>
+## `compare_models_comparative`                                 <a href="https://github.com/averinpa/bnm/blob/main/bnm/viz.py#L204" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 compare_models_comparative(list_of_dags, 
@@ -332,13 +332,13 @@ compare_models_comparative(list_of_dags=[G1, G2],
                             metric='shd',
                             mb_nodes=['A', 'B'])
 ```
-## `analyse_mb`                                 <a href="https://github.com/averinpa/bnm/blob/main/bnm/viz.py#273" style="float: right; font-weight: normal;">[source]</a>
+## `analyse_mb`                                 <a href="https://github.com/averinpa/bnm/blob/main/bnm/viz.py#324" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 analyse_mb(G1, node_names=None, mb_nodes='All')
 ```
 
-Analyze the Markov Blanket space of a DAG and plot distribution of descriptive metrics.
+Analyze the Markov blanket space of a DAG and plot distribution of descriptive metrics.
 
 ### Parameters  
 
