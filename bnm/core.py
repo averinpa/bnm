@@ -323,11 +323,15 @@ class BNMetrics:
             "fn": m.count_false_negatives,
             "precision": m.precision,
             "recall": m.recall,
-            "f1_score": m.f1_score
+            "f1_score": m.f1_score,
+            "sid": m.sid
         }
 
         if metric_names == "All":
             metric_names = list(available.keys())
+        if "sid" in metric_names:
+            metric_names.remove("sid")
+            metric_names.extend(["sid", "sid_lower_bound", "sid_upper_bound"])
 
         columns = ["node_name"] + metric_names
         df = pd.DataFrame(index=range(len(graph_dict)), columns=columns)
@@ -336,11 +340,22 @@ class BNMetrics:
         for node in graph_dict:
             d1 = graph_dict[node]["d1"]
             d2 = graph_dict[node]["d2"]
+            d3 = graph_dict[node]["d3"]
 
             for name in metric_names:
                 func = available.get(name)
                 if func:
-                    df.loc[df["node_name"] == node, name] = func(d1, d2)
+                    if name == "sid":
+                        for u, v in d1.edges():
+                            if d1[u][v].get('type') == 'undirected':
+                                print("Error: The first graph (G1) must be a fully directed DAG for SID calculation.")
+                                return None
+                        sid_result = func(d1, d3)
+                        df.loc[df["node_name"] == node, "sid"] = sid_result["sid"]
+                        df.loc[df["node_name"] == node, "sid_lower_bound"] = sid_result["sid_lower_bound"]
+                        df.loc[df["node_name"] == node, "sid_upper_bound"] = sid_result["sid_upper_bound"]
+                    else:
+                        df.loc[df["node_name"] == node, name] = func(d1, d2)
 
         return df
 
@@ -373,19 +388,22 @@ class BNMetrics:
         
         ### Comparative Metrics
 
-        | Metric         | Description|
-        |----------------|------------|
-        | `additions`    | Edges present in G2 but not in G1 (ignoring direction)|
-        | `deletions`    | Edges present in G1 but not in G2 (ignoring direction)|
-        | `reversals`    | Directed edges that were reversed or became undirected|
-        | `shd`          | Structural Hamming Distance (additions + deletions + reversals)|
-        | `hd`           | Hamming Distance (additions + deletions only)|
-        | `tp`           | Edges presented in two graphs|
-        | `fp`           | Edges in G2 not in G1|
-        | `fn`           | Missing edges in G2 that were in G1|
-        | `precision`    | TP / (TP + FP)|
-        | `recall`       | TP / (TP + FN)|
-        | `f1_score`     | Harmonic mean of precision and recall|
+        | Metric                | Description|
+        |-----------------------|------------|
+        | `additions`           | Edges present in G2 but not in G1 (ignoring direction)|
+        | `deletions`           | Edges present in G1 but not in G2 (ignoring direction)|
+        | `reversals`           | Directed edges that were reversed or became undirected|
+        | `shd`                 | Structural Hamming Distance (additions + deletions + reversals)|
+        | `hd`                  | Hamming Distance (additions + deletions only)|
+        | `tp`                  | Edges presented in two graphs|
+        | `fp`                  | Edges in G2 not in G1|
+        | `fn`                  | Missing edges in G2 that were in G1|
+        | `precision`           | TP / (TP + FP)|
+        | `recall`              | TP / (TP + FN)|
+        | `f1_score`            | Harmonic mean of precision and recall|
+        | `sid`                 | Structural Intervention Distance|
+        | `sid_lower_bound`     | Lower bound of SID if compared to CPDAG|
+        | `sid_lower_bound`     | Upper bound of SID if compared to CPDAG|
 
 
         Parameters
@@ -459,6 +477,87 @@ class BNMetrics:
             elif descriptive_metrics is None and comparison_metrics is not None:
                 print('comparative metrics only available when there are two graphs')
                 return None
+
+    def sid(self, nodes='All', output=True):
+        """
+        Compute the Structural Intervention Distance (SID) between Markov blanket 
+        of a node (or list of nodes) in the first DAG and the same set of nodes in the estimated DAG (CPDAG).
+        SID quantifes the closeness between two DAGs in terms of their corresponding causal
+        inference statements. It is well-suited for evaluating graphs that are used for computing
+        interventions.
+        https://doi.org/10.48550/arXiv.1306.1043
+        This implementation is a translation of the R package SID originally developed by Jonas Peters. 
+        All credit for the original methodology and implementation goes to the author.
+        The first graph (G1), representing the "true" causal structure, must be a fully directed DAG.
+        If G1 contains any undirected edges (e.g., from a CPDAG), the calculation is invalid and 
+        this function will return None.
+
+        Parameters
+        ----------
+        nodes : str or list of str, default = 'All'
+            If 'All', compare the full graphs. Otherwise, compare Markov blanket 
+            of a node (or list of nodes) in the first DAG and the same set of nodes in the estimated DAG (CPDAG).
+
+        output : bool, default = True
+            If True, prints the SID score a matrix with the mistakes.
+
+        Returns
+        -------
+        sid_dict : dict or None
+            A dictionary with the following keys:
+            - 'sid': the SID value
+            - 'sid_lower_bound': lower bound (if G2 is a CPDAG)
+            - 'sid_upper_bound': upper bound (if G2 is a CPDAG)
+            - 'incorrect_mat': a matrix showing where intervention predictions differ
+            Returns None if G1 is not a DAG.
+
+        Example
+        -------
+        >>> import numpy as np
+        >>> from bnm import BNMetrics
+
+        >>> G1 = np.array([
+        ...     [0, 1, 1],
+        ...     [0, 0, 1],
+        ...     [0, 0, 0]
+        ... ])
+        >>> G2 = np.array([
+        ...     [0, 0, 1],
+        ...     [1, 0, 1],
+        ...     [0, 0, 0]
+        ... ])
+        >>> nodes = ['A', 'B', 'C']
+        >>> bnm = BNMetrics(G1, G2, node_names=nodes)
+        >>> sid_result = bnm.sid(nodes='C', output=True)
+        sid: 2
+        sid_lower_bound: 2
+        sid_upper_bound: 2
+        ================================================
+        incorrect_mat:
+        [[0. 1. 1.]
+        [1. 0. 1.]
+        [0. 0. 0.]]
+          
+        """
+        G1 = self._merge_graphs_no_duplicates_clean(nodes, 'd1')
+        G2 = self._merge_graphs_no_duplicates_clean(nodes, 'd3')
+        for u, v in G1.edges():
+            if G1[u][v].get('type') == 'undirected':
+                print("Error: The first graph (G1) must be a fully directed DAG for SID calculation.")
+                return None
+        sid_dict = m.sid(G1, G2)
+        if output:
+            print(f"""
+sid: {sid_dict['sid']}\n
+sid_lower_bound: {sid_dict['sid_lower_bound']}\n
+sid_upper_bound: {sid_dict['sid_upper_bound']}\n
+================================================
+incorrect_mat:\n{sid_dict['incorrect_mat']}
+
+""")
+        return sid_dict
+
+
 
     def _mark_true_positives_color_both(self, nodes, option=1):
         """

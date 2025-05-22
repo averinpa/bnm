@@ -33,6 +33,41 @@ def mark_and_collapse_bidirected_edges(graph):
 
     return G
 
+def graph_to_matrix(G, node_order=None):
+    """
+    Convert a custom DiGraph (with 'type' edge attribute) into a SID-compatible
+    DAG adjacency matrix: 1 = i → j, 0 = no edge.
+    Undirected edges are treated as bidirectional (i.e., two directed edges).
+    """
+    if node_order is None:
+        node_order = list(G.nodes())
+    n = len(node_order)
+    index = {node: i for i, node in enumerate(node_order)}
+    mat = np.zeros((n, n), dtype=int)
+
+    for u, v, data in G.edges(data=True):
+        i, j = index[u], index[v]
+        edge_type = data.get("type", "directed")
+
+        # Add i → j
+        mat[i, j] = 1
+        # If undirected, also add j → i
+        if edge_type == "undirected":
+            mat[j, i] = 1
+
+    return mat, node_order
+
+def get_undirected_components_with_isolates(G):
+    all_nodes = set(G.nodes())
+    G_undir = nx.Graph()
+    G_undir.add_nodes_from(all_nodes)
+
+    for u, v, data in G.edges(data=True):
+        if data.get("type") == "undirected":
+            G_undir.add_edge(u, v)
+
+    return list(nx.connected_components(G_undir))
+
 def get_markov_blanket_subgraph(graph, node):
     """
     Return the subgraph induced by the Markov Blanket of the given node.
