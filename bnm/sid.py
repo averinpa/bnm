@@ -59,14 +59,13 @@ def all_dags_intern(adj_full, sub_adj, node_indices, tmp=None):
     Returns:
     - tmp: list of DAGs as NumPy arrays
     """
+    if tmp is None:
+        tmp = []
     if np.any((sub_adj + sub_adj.T) == 1):
         raise ValueError("Submatrix is not fully undirected (not symmetric).")
 
     if np.sum(sub_adj) == 0:
-        # All edges have been oriented
-        if tmp is None:
-            tmp = [adj_full.copy().flatten()]
-        elif not any(np.array_equal(adj_full, t) for t in tmp):
+        if not any(np.array_equal(adj_full.flatten(), t) for t in tmp):
             tmp.append(adj_full.copy().flatten())
         return tmp
 
@@ -98,7 +97,7 @@ def all_dags_intern(adj_full, sub_adj, node_indices, tmp=None):
 
         tmp = all_dags_intern(adj_new, new_sub_adj, new_node_indices, tmp)
 
-    return np.array([dag.flatten() for dag in tmp])
+    return tmp
 
 def all_dags_jonas(adj_matrix, node_indices):
     """
@@ -117,8 +116,9 @@ def all_dags_jonas(adj_matrix, node_indices):
     if np.any((sub_adj + sub_adj.T) == 1):
         # The subgraph has at least one directed edge (i.e., not symmetric)
         return -1
-
-    return all_dags_intern(adj_matrix.copy(), sub_adj, np.array(node_indices), tmp=None)
+    
+    dags = all_dags_intern(adj_matrix.copy(), sub_adj, np.array(node_indices), tmp=None)
+    return np.array(dags)
 
 
 def dsepadj(a_mat, i, cond_set):
