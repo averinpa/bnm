@@ -3,7 +3,7 @@ import numpy as np
 pd.options.display.max_columns = 999
 import networkx as nx
 import graphviz
-
+import plotly.graph_objects as go
 from IPython.display import display, HTML
 
 from bnm.utils import mark_and_collapse_bidirected_edges, get_markov_blanket_subgraph
@@ -540,6 +540,7 @@ class BNMetrics:
           
         """
         G1 = self._merge_graphs_no_duplicates_clean(nodes, 'd1')
+        self.sid_nodes = list(G1.nodes())
         G2 = self._merge_graphs_no_duplicates_clean(nodes, 'd3')
         for u, v in G1.edges():
             if G1[u][v].get('type') == 'undirected':
@@ -557,6 +558,74 @@ incorrect_mat:\n{sid_dict['incorrect_mat']}
 """)
         return sid_dict
 
+
+    def plot_sid_matrix(self, nodes=['All'], sid_dict=None):
+        """
+        Visualize the incorrect intervention matrix (`incorrect_mat`) from the SID result
+        as a heatmap using Plotly.
+
+        Parameters
+        ----------
+        nodes : list of str, default = ['All']
+            Node(s) used for SID computation. Makes sense only if sid_dict=None
+
+        sid_dict : dict or None, default = None
+            The output of `self.sid()`. If None, it will compute `self.sid(nodes, output=False)` internally.
+
+        Returns
+        -------
+        The Plotly figure object is displayed.
+
+        Example
+        -------
+        >>> import numpy as np
+        >>> from bnm import BNMetrics
+
+        >>> G1 = np.array([
+        ...     [0, 1, 1],
+        ...     [0, 0, 1],
+        ...     [0, 0, 0]
+        ... ])
+        >>> G2 = np.array([
+        ...     [0, 0, 1],
+        ...     [1, 0, 1],
+        ...     [0, 0, 0]
+        ... ])
+        >>> nodes = ['A', 'B', 'C']
+        >>> bnm = BNMetrics(G1, G2, node_names=nodes)
+        >>> bnm.plot_sid_matrix()
+               
+        """
+        if sid_dict is None:
+            sid_dict = self.sid(nodes=nodes, output=False)
+
+        mat = sid_dict['incorrect_mat']
+        sid_val = sid_dict['sid']
+
+        labels = self.sid_nodes
+
+        fig = go.Figure(data=go.Heatmap(
+            z=mat,
+            x=labels,
+            y=labels,
+            showscale=False,
+            xgap=1,
+            ygap=1,
+            zmin=0,
+            zmax=1,
+            colorscale=[[0.0, 'white'], [0.9999, 'white'], [1.0, 'crimson']]
+        ))
+
+        fig.update_layout(
+            title=f"SID: {int(sid_val)}",
+            xaxis=dict(showgrid=False, tickangle=90, side='top'),
+            yaxis=dict(showgrid=False, autorange='reversed'),
+            width=500,
+            height=500
+        )
+
+        fig.show()
+        return None
 
 
     def _mark_true_positives_color_both(self, nodes, option=1):

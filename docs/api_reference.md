@@ -272,6 +272,48 @@ sid_result = bnm.sid(nodes='C', output=True)
 ---
 
 
+## BNMetrics.plot_sid_matrix                      <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L690" style="float: right; font-weight: normal;">[source]</a>
+
+```python
+BNMetrics.plot_sid_matrix(nodes=['All'], sid_dict=None)
+```
+
+ Plot a single DAG composed of merged Markov Blanket subgraphs for the specified nodes.  
+This method constructs a graph by merging subgraphs from a specific layer ('d1', 'd2', or 'd3') for each node in the list, highlights the selected nodes in green, and renders the network using Graphviz.
+
+### Parameters
+**nodes**: `list[str]`  
+: A list of node names (e.g., ['X_1', 'X_2', ...]) to extract subgraphs from `self.graph_dict`.  
+**layer**: `str`, `default="d1"`  
+The subgraph layer to visualize:
+- 'd1' : Markov Blanket from G1 (always available)
+- 'd2' : Markov Blanket from G2 (requires G2)
+- 'd3' : Subgraph from G2 using nodes from G1's MB (requires G2)  
+**title**: `str`, `default="DAG"`  
+:  Title displayed above the plotted graph.
+
+### Returns
+
+- `None`  
+  Displays a DAG using Graphviz within a Jupyter notebook environment.
+
+### Raises
+**ValueError** 
+- If `layer` is 'd2' or 'd3' but no second graph (G2) was provided during initialization.
+
+### Example
+```python
+from bnm import BNMetrics
+import networkx as nx
+G1 = nx.DiGraph()
+G1.add_edges_from([("A", "B"), ("B", "C")])
+bn = BNMetrics(G1)
+bn.plot_bn(nodes=['A', 'B'], layer='d1', title='Markov Blanket')
+```
+
+---
+
+
 ## BNMetrics.plot_bn                      <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L690" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
