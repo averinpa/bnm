@@ -278,37 +278,42 @@ sid_result = bnm.sid(nodes='C', output=True)
 BNMetrics.plot_sid_matrix(nodes=['All'], sid_dict=None)
 ```
 
- Plot a single DAG composed of merged Markov Blanket subgraphs for the specified nodes.  
-This method constructs a graph by merging subgraphs from a specific layer ('d1', 'd2', or 'd3') for each node in the list, highlights the selected nodes in green, and renders the network using Graphviz.
+Visualize the incorrect intervention matrix (`incorrect_mat`) from the SID result as a heatmap using Plotly.
 
 ### Parameters
 **nodes**: `list[str]`  
 : A list of node names (e.g., ['X_1', 'X_2', ...]) to extract subgraphs from `self.graph_dict`.  
-**layer**: `str`, `default="d1"`  
-The subgraph layer to visualize:
-- 'd1' : Markov Blanket from G1 (always available)
-- 'd2' : Markov Blanket from G2 (requires G2)
-- 'd3' : Subgraph from G2 using nodes from G1's MB (requires G2)  
-**title**: `str`, `default="DAG"`  
-:  Title displayed above the plotted graph.
+**sid_dict**: `dict`, `default=None`  
+A dictionary with the following keys:
+- 'sid': the SID value
+- 'sid_lower_bound': lower bound (if G2 is a CPDAG)
+- 'sid_upper_bound': upper bound (if G2 is a CPDAG)
+- 'incorrect_mat': a matrix showing where intervention predictions differ   
 
 ### Returns
 
 - `None`  
-  Displays a DAG using Graphviz within a Jupyter notebook environment.
+  The Plotly figure object is displayed.
 
-### Raises
-**ValueError** 
-- If `layer` is 'd2' or 'd3' but no second graph (G2) was provided during initialization.
 
 ### Example
 ```python
+import numpy as np
 from bnm import BNMetrics
-import networkx as nx
-G1 = nx.DiGraph()
-G1.add_edges_from([("A", "B"), ("B", "C")])
-bn = BNMetrics(G1)
-bn.plot_bn(nodes=['A', 'B'], layer='d1', title='Markov Blanket')
+
+G1 = np.array([
+      [0, 1, 1],
+      [0, 0, 1],
+      [0, 0, 0]
+  ])
+G2 = np.array([
+      [0, 0, 1],
+      [1, 0, 1],
+      [0, 0, 0]
+  ])
+nodes = ['A', 'B', 'C']
+bnm = BNMetrics(G1, G2, node_names=nodes)
+bnm.plot_sid_matrix()
 ```
 
 ---
