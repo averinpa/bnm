@@ -1,5 +1,6 @@
 import networkx as nx
 import numpy as np
+from bnm.sid import sid_metric
 
 # ==========================
 # Descriptive Graph Metrics
@@ -705,3 +706,9 @@ def f1_score(G1, G2):
         return 0.0
 
     return 2 * (p * r) / (p + r)
+
+def sid(G1, G2):
+    """
+    Add Doc
+    """
+    return sid_metric(G1, G2)

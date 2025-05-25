@@ -116,6 +116,9 @@ This method supports flexible inclusion of:
 | `precision`    | TP / (TP + FP)|
 | `recall`       | TP / (TP + FN)|
 | `f1_score`     | Harmonic mean of precision and recall|
+| `sid`                 | Structural Intervention Distance|
+| `sid_lower_bound`     | Lower bound of SID if compared to CPDAG|
+| `sid_lower_bound`     | Upper bound of SID if compared to CPDAG|
 
 
 ### Parameters
@@ -203,6 +206,113 @@ bn.compare_two_bn(nodes=['A', 'B'], option=1, name1='Original', name2='Modified'
 ```
 
 ---
+
+
+## BNMetrics.sid                      <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L690" style="float: right; font-weight: normal;">[source]</a>
+
+```python
+BNMetrics.sid(nodes, output=True)
+```
+
+Compute the Structural Intervention Distance (SID) between Markov blanket 
+of a node (or list of nodes) in the first DAG and the same set of nodes in the estimated DAG (CPDAG).  
+SID quantifes the closeness between two DAGs in terms of their corresponding causal
+inference statements. It is well-suited for evaluating graphs that are used for computing
+interventions.    
+This implementation is a translation of the R package SID originally developed by Jonas Peters. All credit for the original methodology and implementation goes to the author.  
+https://doi.org/10.48550/arXiv.1306.1043   
+The first graph (G1), representing the "true" causal structure, must be a fully directed DAG.
+If G1 contains any undirected edges (e.g., from a CPDAG), the calculation is invalid and 
+this function will return None.
+
+### Parameters
+**nodes**: `str` or `[str]`, `default = 'All'`  
+: If 'All', compare the full graphs. Otherwise, compare Markov blanket of a node (or list of nodes) in the first DAG and the same set of nodes in the estimated DAG (CPDAG).   
+**output**: `bool`, `default = True`  
+: If True, prints the SID score a matrix with the mistakes..
+        Returns
+        -------
+        sid_dict : dict or None
+            A dictionary with the following keys:
+            - 'sid': the SID value
+            - 'sid_lower_bound': lower bound (if G2 is a CPDAG)
+            - 'sid_upper_bound': upper bound (if G2 is a CPDAG)
+            - 'incorrect_mat': a matrix showing where intervention predictions differ
+            Returns None if G1 is not a DAG.
+### Returns
+
+- `dict` or `None`  
+A dictionary with the following keys:
+  - 'sid': the SID value
+  - 'sid_lower_bound': lower bound (if G2 is a CPDAG)
+  - 'sid_upper_bound': upper bound (if G2 is a CPDAG)
+  - 'incorrect_mat': a matrix showing where intervention predictions differ  
+Returns None if G1 is not a DAG.
+
+
+### Example
+```python
+import numpy as np
+from bnm import BNMetrics
+
+G1 = np.array([
+      [0, 1, 1],
+      [0, 0, 1],
+      [0, 0, 0]
+  ])
+G2 = np.array([
+      [0, 0, 1],
+      [1, 0, 1],
+      [0, 0, 0]
+  ])
+nodes = ['A', 'B', 'C']
+bnm = BNMetrics(G1, G2, node_names=nodes)
+sid_result = bnm.sid(nodes='C', output=True)
+```
+---
+
+
+## BNMetrics.plot_sid_matrix                      <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L690" style="float: right; font-weight: normal;">[source]</a>
+
+```python
+BNMetrics.plot_sid_matrix(nodes=['All'], sid_dict=None)
+```
+
+ Plot a single DAG composed of merged Markov Blanket subgraphs for the specified nodes.  
+This method constructs a graph by merging subgraphs from a specific layer ('d1', 'd2', or 'd3') for each node in the list, highlights the selected nodes in green, and renders the network using Graphviz.
+
+### Parameters
+**nodes**: `list[str]`  
+: A list of node names (e.g., ['X_1', 'X_2', ...]) to extract subgraphs from `self.graph_dict`.  
+**layer**: `str`, `default="d1"`  
+The subgraph layer to visualize:
+- 'd1' : Markov Blanket from G1 (always available)
+- 'd2' : Markov Blanket from G2 (requires G2)
+- 'd3' : Subgraph from G2 using nodes from G1's MB (requires G2)  
+**title**: `str`, `default="DAG"`  
+:  Title displayed above the plotted graph.
+
+### Returns
+
+- `None`  
+  Displays a DAG using Graphviz within a Jupyter notebook environment.
+
+### Raises
+**ValueError** 
+- If `layer` is 'd2' or 'd3' but no second graph (G2) was provided during initialization.
+
+### Example
+```python
+from bnm import BNMetrics
+import networkx as nx
+G1 = nx.DiGraph()
+G1.add_edges_from([("A", "B"), ("B", "C")])
+bn = BNMetrics(G1)
+bn.plot_bn(nodes=['A', 'B'], layer='d1', title='Markov Blanket')
+```
+
+---
+
 
 ## BNMetrics.plot_bn                      <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L690" style="float: right; font-weight: normal;">[source]</a>
 
