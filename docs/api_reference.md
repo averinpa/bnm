@@ -72,7 +72,7 @@ mat2 = np.array([[0, 0], [1, 0]])
 bnm = BNMetrics(mat1, mat2, node_names=["X1", "X2"])
 ```
 
-## BNMetrics.compare_df                       <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L347" style="float: right; font-weight: normal;">[source]</a>
+## BNMetrics.compare_df                       <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L362" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 BNMetrics.compare_df(descriptive_metrics='All', comparison_metrics='All')
@@ -159,7 +159,7 @@ df = bn.compare_df(
 
 ---
 
-## BNMetrics.compare_two_bn                       <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L578" style="float: right; font-weight: normal;">[source]</a>
+## BNMetrics.compare_two_bn                       <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L746" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 BNMetrics.compare_two_bn(nodes, option=1, name1='DAG1', name2='DAG2')
@@ -208,7 +208,7 @@ bn.compare_two_bn(nodes=['A', 'B'], option=1, name1='Original', name2='Modified'
 ---
 
 
-## BNMetrics.sid                      <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L690" style="float: right; font-weight: normal;">[source]</a>
+## BNMetrics.sid                      <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L481" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 BNMetrics.sid(nodes, output=True)
@@ -272,7 +272,7 @@ sid_result = bnm.sid(nodes='C', output=True)
 ---
 
 
-## BNMetrics.plot_sid_matrix                      <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L690" style="float: right; font-weight: normal;">[source]</a>
+## BNMetrics.plot_sid_matrix                      <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L562" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 BNMetrics.plot_sid_matrix(nodes=['All'], sid_dict=None)
@@ -319,7 +319,7 @@ bnm.plot_sid_matrix()
 ---
 
 
-## BNMetrics.plot_bn                      <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L690" style="float: right; font-weight: normal;">[source]</a>
+## BNMetrics.plot_bn                      <a href="https://github.com/averinpa/bnm/blob/main/bnm/core.py#L858" style="float: right; font-weight: normal;">[source]</a>
 
 ```python
 BNMetrics.plot_bn(nodes, layer="d1", title="DAG")
@@ -482,4 +482,5 @@ analyse_mb(G1, node_names=None, mb_nodes='All')
 ## Use Cases: 
 - [Evaluate Single DAG](https://github.com/averinpa/bnm/blob/main/use%20cases/evaluate%20single%20DAG.ipynb)
 - [Compare Two DAGs](https://github.com/averinpa/bnm/blob/main/use%20cases/compare%20two%20DAGs.ipynb)
-- [Use Case: Compare Algorithms](https://github.com/averinpa/bnm/blob/main/use%20cases/compare%20algorithms.ipynb)
+- [Compare Algorithms](https://github.com/averinpa/bnm/blob/main/use%20cases/compare%20algorithms.ipynb)  
+- [SID](https://github.com/averinpa/bnm/blob/main/use%20cases/sid.ipynb)

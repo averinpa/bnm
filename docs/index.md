@@ -11,6 +11,7 @@ BNM is a Python package for evaluating, comparing, and visualizing DAGs, origina
 - Use Cases: 
     - [Evaluate Single DAG](https://github.com/averinpa/bnm/blob/main/use%20cases/evaluate%20single%20DAG.ipynb)
     - [Compare Two DAGs](https://github.com/averinpa/bnm/blob/main/use%20cases/compare%20two%20DAGs.ipynb)
-    - [Compare Algorithms](https://github.com/averinpa/bnm/blob/main/use%20cases/compare%20algorithms.ipynb)
+    - [Compare Algorithms](https://github.com/averinpa/bnm/blob/main/use%20cases/compare%20algorithms.ipynb)  
+    - [SID](https://github.com/averinpa/bnm/blob/main/use%20cases/sid.ipynb)
 
 ---
